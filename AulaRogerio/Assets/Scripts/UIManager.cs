@@ -23,9 +23,16 @@ public class UIManager : NetworkBehaviour
         else
         {
             Debug.Log("Host Started");
+
+            if(NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject().IsSpawned)
+            {
+                NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject().GetComponent<PlayerController>().StartLocation();
+                Debug.Log("Spawned");
+            }
         }
 
         StartCoroutine(CheckPlayers());
+
     }
 
     public void StartClient()
@@ -37,6 +44,12 @@ public class UIManager : NetworkBehaviour
         else
         {
             Debug.Log("Client Started");
+
+            if (NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject().IsSpawned)
+            {
+                NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject().GetComponent<PlayerController>().StartLocation();
+                Debug.Log("Spawned");
+            }
         }
 
         StartCoroutine(CheckPlayers());
