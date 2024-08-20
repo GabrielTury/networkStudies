@@ -11,12 +11,4 @@ namespace Unity.Multiplayer.Samples.Utilities.ClientAuthority
             return false;
         }
     }
-
-    public class OwnerNetworkAnimator : NetworkAnimator
-    {
-        protected override bool OnIsServerAuthoritative()
-        {
-            return false;
-        }
-    }
 }

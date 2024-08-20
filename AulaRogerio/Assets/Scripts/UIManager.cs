@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.InputSystem.XR;
 
 public class UIManager : NetworkBehaviour
 {
@@ -28,6 +29,7 @@ public class UIManager : NetworkBehaviour
             {
                 NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject().GetComponent<PlayerController>().StartLocation();
                 Debug.Log("Spawned");
+                
             }
         }
 

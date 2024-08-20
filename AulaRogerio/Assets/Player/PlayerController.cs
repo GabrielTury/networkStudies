@@ -1,15 +1,26 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.InputSystem;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : NetworkBehaviour
 {
-    InputAction move, turn;
+    InputAction move, turn, shoot;
 
-    Animator animator;
+    [HideInInspector]
+    public Animator animator;
+
+    [HideInInspector]
+    public float movementAxis;
+
+    [SerializeField]
+    private GameObject bullet;
+
+    [SerializeField]
+    private Transform bulletPoint;
 
     private void Awake()
     {
@@ -17,30 +28,70 @@ public class PlayerController : MonoBehaviour
 
         move = iGame.Game.Move;
         turn = iGame.Game.Turn;
+        shoot = iGame.Game.Shoot;
 
         animator = GetComponent<Animator>();
+
+
         animator.applyRootMotion = false;
     }
+
 
     private void OnEnable()
     {
         move.Enable();
         turn.Enable();
+        shoot.Enable();
     }
 
     // Update is called once per frame
     void Update()
     {
-
+        if (!IsOwner) return;
 
         transform.Translate(0,0,
             move.ReadValue<float>() * 10 * Time.deltaTime);
-
+        movementAxis = move.ReadValue<float>();
 
         transform.Rotate(0,
             turn.ReadValue<float>() * 180 * Time.deltaTime,0);
 
         animator.SetFloat("MoveValue", Mathf.Abs(move.ReadValue<float>()));
+
+        if(shoot.WasPressedThisFrame())
+        {
+            if(IsServer)
+            {
+                ShootClientRpc();
+                Debug.Log("Server");
+            }
+            else if(IsClient)
+            {
+                ShootServerRpc();
+                Debug.Log("Client");
+            }
+
+        }
+    }
+
+    [ClientRpc]
+    public void ShootClientRpc()
+    {
+        Instantiate(bullet, bulletPoint.transform.position, bulletPoint.transform.rotation);
+    }
+
+    [ClientRpc]
+    public void SyncBulletOnClientRpc()
+    {
+        Instantiate(bullet, bulletPoint.transform.position, bulletPoint.transform.rotation);
+    }
+
+    [ServerRpc]
+    public void ShootServerRpc()
+    {
+        Instantiate(bullet, bulletPoint.transform.position, bulletPoint.transform.rotation);
+
+        SyncBulletOnClientRpc();
     }
 
     public void StartLocation()
@@ -66,7 +117,9 @@ public class PlayerController : MonoBehaviour
     {
         while(true)
         {
-            transform.Translate(0, 1f * Time.deltaTime, 0);
+            if(transform.position.y <= 1)            
+                transform.Translate(0, 1f * Time.deltaTime, 0);
+
             yield return new WaitForEndOfFrame();
         }
 
@@ -77,7 +130,9 @@ public class PlayerController : MonoBehaviour
     {
         while (true)
         {
-            transform.Translate(0, -1f * Time.deltaTime, 0);
+            if (transform.position.y >= 0)
+                transform.Translate(0, -1f * Time.deltaTime, 0);
+
             yield return new WaitForEndOfFrame();
         }
 
@@ -94,5 +149,6 @@ public class PlayerController : MonoBehaviour
     {
         move.Disable();
         turn.Disable();
+        shoot.Disable();
     }
 }
