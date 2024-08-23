@@ -80,18 +80,14 @@ public class PlayerController : NetworkBehaviour
         Instantiate(bullet, bulletPoint.transform.position, bulletPoint.transform.rotation);
     }
 
-    [ClientRpc]
-    public void SyncBulletOnClientRpc()
-    {
-        Instantiate(bullet, bulletPoint.transform.position, bulletPoint.transform.rotation);
-    }
 
     [ServerRpc]
     public void ShootServerRpc()
     {
-        Instantiate(bullet, bulletPoint.transform.position, bulletPoint.transform.rotation);
+        GameObject b = Instantiate(bullet, bulletPoint.transform.position, bulletPoint.transform.rotation);
 
-        SyncBulletOnClientRpc();
+        b.GetComponent<NetworkObject>().Spawn();
+
     }
 
     public void StartLocation()

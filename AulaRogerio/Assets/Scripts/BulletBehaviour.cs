@@ -30,6 +30,16 @@ public class BulletBehaviour : NetworkBehaviour
     private void OnDisable()
     {
         timeAlive = 0;
+        if(!NetworkManager.Singleton.IsHost)
+        {
+            GetComponent<NetworkObject>().Despawn();
+        }
+
         Destroy(gameObject);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        
     }
 }
