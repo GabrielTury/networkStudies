@@ -8,6 +8,14 @@ public class BulletBehaviour : NetworkBehaviour
     
     float timeAlive;
 
+    public enum BulletOwner
+    {
+        Host,
+        Client
+    };
+
+    public BulletOwner owner;
+
     private void OnEnable()
     {
         timeAlive = 0;
@@ -30,16 +38,39 @@ public class BulletBehaviour : NetworkBehaviour
     private void OnDisable()
     {
         timeAlive = 0;
-        if(!NetworkManager.Singleton.IsHost)
-        {
-            GetComponent<NetworkObject>().Despawn();
-        }
 
         Destroy(gameObject);
     }
 
-    private void OnCollisionEnter(Collision collision)
+    [ServerRpc]
+    private void AddServerRpc()
     {
-        
+        UIManager.instance.AddScore(10);
+    }
+
+    [ClientRpc]
+    private void AddClientRpc()
+    {
+        if (IsHost) return;
+        Debug.LogError("Should Only Call on client");
+        UIManager.instance.AddScore(10);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        Debug.Log("Trigger");
+        if (other.CompareTag("Player"))
+        {
+            Debug.Log("Hit");
+
+            if(IsHost && owner == BulletOwner.Host)
+                AddServerRpc();
+                
+            if (owner == BulletOwner.Client)
+                AddClientRpc();
+
+            Destroy(gameObject);
+
+        }
     }
 }

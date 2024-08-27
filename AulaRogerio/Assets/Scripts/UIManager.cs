@@ -13,8 +13,28 @@ public class UIManager : NetworkBehaviour
     #region Variables
     [SerializeField]
     private TMP_Text clientText;
+    [SerializeField]
+    private TMP_Text scoreText;
+    private int localScore;
     #endregion
 
+    #region Singleton
+    public static UIManager instance { get; private set; }
+    #endregion
+
+
+
+    private void Awake()
+    {
+        if(instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(this);
+        }
+    }
     public void StartHost()
     {
         if (!NetworkManager.Singleton.StartHost())
@@ -79,5 +99,10 @@ public class UIManager : NetworkBehaviour
         yield return null;
     }
 
+    public void AddScore(int add)
+    {
+        localScore += add;
+        scoreText.text = string.Format("Score: {0}", localScore);
+    }
 
 }

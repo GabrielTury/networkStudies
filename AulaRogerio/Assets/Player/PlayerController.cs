@@ -19,6 +19,8 @@ public class PlayerController : NetworkBehaviour
     [SerializeField]
     private GameObject bullet;
 
+    private GameObject bul;
+
     [SerializeField]
     private Transform bulletPoint;
 
@@ -60,34 +62,39 @@ public class PlayerController : NetworkBehaviour
 
         if(shoot.WasPressedThisFrame())
         {
-            if(IsServer)
+            
+            
+            if(IsHost)
             {
-                ShootClientRpc();
-                Debug.Log("Server");
+                bullet.GetComponent<BulletBehaviour>().owner = BulletBehaviour.BulletOwner.Host;
             }
-            else if(IsClient)
+            else
             {
-                ShootServerRpc();
-                Debug.Log("Client");
+                SetClientOwnerServerRpc();
             }
-
+                ShootServerRpc();                           
         }
-    }
-
-    [ClientRpc]
-    public void ShootClientRpc()
-    {
-        Instantiate(bullet, bulletPoint.transform.position, bulletPoint.transform.rotation);
     }
 
 
     [ServerRpc]
     public void ShootServerRpc()
     {
-        GameObject b = Instantiate(bullet, bulletPoint.transform.position, bulletPoint.transform.rotation);
+        GameObject a = Instantiate(bullet, bulletPoint.transform.position, bulletPoint.transform.rotation);
+        Debug.LogWarning(a.GetComponent<BulletBehaviour>().owner);
 
-        b.GetComponent<NetworkObject>().Spawn();
+        NetworkObject no = a.GetComponent<NetworkObject>();
+        if(no != null)
+        {
+            no.gameObject.GetComponent<BulletBehaviour>().owner = bullet.GetComponent<BulletBehaviour>().owner;
+            no.Spawn();
+        }
+    }
 
+    [ServerRpc]
+    public void SetClientOwnerServerRpc()
+    {
+        bullet.GetComponent<BulletBehaviour>().owner = BulletBehaviour.BulletOwner.Client;
     }
 
     public void StartLocation()
