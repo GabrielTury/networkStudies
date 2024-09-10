@@ -88,6 +88,7 @@ public class PlayerController : NetworkBehaviour
         {
             no.gameObject.GetComponent<BulletBehaviour>().owner = bullet.GetComponent<BulletBehaviour>().owner;
             no.Spawn();
+            Debug.Log("Called networkSpawn");
         }
     }
 

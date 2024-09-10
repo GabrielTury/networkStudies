@@ -53,6 +53,15 @@ public partial class @InputActionsGame: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""MoveAi"",
+                    ""type"": ""Button"",
+                    ""id"": ""bf1f6260-4572-499b-afa1-562211345a81"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -264,6 +273,17 @@ public partial class @InputActionsGame: IInputActionCollection2, IDisposable
                     ""action"": ""Shoot"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2afd7f31-e548-4e8e-a892-241d5b9654a8"",
+                    ""path"": ""<Keyboard>/m"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveAi"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -275,6 +295,7 @@ public partial class @InputActionsGame: IInputActionCollection2, IDisposable
         m_Game_Move = m_Game.FindAction("Move", throwIfNotFound: true);
         m_Game_Turn = m_Game.FindAction("Turn", throwIfNotFound: true);
         m_Game_Shoot = m_Game.FindAction("Shoot", throwIfNotFound: true);
+        m_Game_MoveAi = m_Game.FindAction("MoveAi", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -339,6 +360,7 @@ public partial class @InputActionsGame: IInputActionCollection2, IDisposable
     private readonly InputAction m_Game_Move;
     private readonly InputAction m_Game_Turn;
     private readonly InputAction m_Game_Shoot;
+    private readonly InputAction m_Game_MoveAi;
     public struct GameActions
     {
         private @InputActionsGame m_Wrapper;
@@ -346,6 +368,7 @@ public partial class @InputActionsGame: IInputActionCollection2, IDisposable
         public InputAction @Move => m_Wrapper.m_Game_Move;
         public InputAction @Turn => m_Wrapper.m_Game_Turn;
         public InputAction @Shoot => m_Wrapper.m_Game_Shoot;
+        public InputAction @MoveAi => m_Wrapper.m_Game_MoveAi;
         public InputActionMap Get() { return m_Wrapper.m_Game; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -364,6 +387,9 @@ public partial class @InputActionsGame: IInputActionCollection2, IDisposable
             @Shoot.started += instance.OnShoot;
             @Shoot.performed += instance.OnShoot;
             @Shoot.canceled += instance.OnShoot;
+            @MoveAi.started += instance.OnMoveAi;
+            @MoveAi.performed += instance.OnMoveAi;
+            @MoveAi.canceled += instance.OnMoveAi;
         }
 
         private void UnregisterCallbacks(IGameActions instance)
@@ -377,6 +403,9 @@ public partial class @InputActionsGame: IInputActionCollection2, IDisposable
             @Shoot.started -= instance.OnShoot;
             @Shoot.performed -= instance.OnShoot;
             @Shoot.canceled -= instance.OnShoot;
+            @MoveAi.started -= instance.OnMoveAi;
+            @MoveAi.performed -= instance.OnMoveAi;
+            @MoveAi.canceled -= instance.OnMoveAi;
         }
 
         public void RemoveCallbacks(IGameActions instance)
@@ -399,5 +428,6 @@ public partial class @InputActionsGame: IInputActionCollection2, IDisposable
         void OnMove(InputAction.CallbackContext context);
         void OnTurn(InputAction.CallbackContext context);
         void OnShoot(InputAction.CallbackContext context);
+        void OnMoveAi(InputAction.CallbackContext context);
     }
 }
