@@ -22,16 +22,23 @@ public class GridCreator : MonoBehaviour
     {
         nodes = new List<Node>();
         int nodeXAmount = (int)(gridSize.x/nodeSize);
-        int nodeYAmount = (int)(gridSize.z / nodeSize);
+        int nodeZAmount = (int)(gridSize.z / nodeSize);
+        int nodeYAmount = (int)(gridSize.y / nodeSize);
 
         float nodeXPos = 0;
         float nodeZPos = 0;
+        float nodeYPos = 0;
         for (int i = 0; i < nodeXAmount; i++)
         {
-            for (int j = 0; j < nodeYAmount; j++)
+            for (int j = 0; j < nodeZAmount; j++)
             {
-                Node node = new Node(nodeXPos, nodeZPos, i+j);
-                nodes.Add(node);
+                for (int k = 0; k < nodeYAmount; k++)
+                {
+                    Node node = new Node(nodeXPos, nodeZPos, nodeYPos, i + j);
+                    nodes.Add(node);
+                    nodeYPos += nodeSize;
+                }
+                nodeYPos = 0;
                 nodeZPos += nodeSize;
             }
 

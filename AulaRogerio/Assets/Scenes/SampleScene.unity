@@ -914,6 +914,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -2648433430224657986, guid: c4cce4d513e304f47b2b049cd1747461,
+        type: 3}
+      propertyPath: go
+      value: 
+      objectReference: {fileID: 7159638591116000982, guid: faf46657b2d66b346a227981fdafb857,
+        type: 3}
+    - target: {fileID: -2648433430224657986, guid: c4cce4d513e304f47b2b049cd1747461,
+        type: 3}
+      propertyPath: debugCube
+      value: 
+      objectReference: {fileID: 7159638591116000982, guid: faf46657b2d66b346a227981fdafb857,
+        type: 3}
     - target: {fileID: 1108078984478586910, guid: c4cce4d513e304f47b2b049cd1747461,
         type: 3}
       propertyPath: m_Name
@@ -927,7 +939,7 @@ PrefabInstance:
     - target: {fileID: 2743965935313943226, guid: c4cce4d513e304f47b2b049cd1747461,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 0.08
       objectReference: {fileID: 0}
     - target: {fileID: 2743965935313943226, guid: c4cce4d513e304f47b2b049cd1747461,
         type: 3}
@@ -2038,7 +2050,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b860bf3e3f7cb54eb2e17d7cdee4334, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gridSize: {x: 50, y: 0, z: 50}
+  debugCube: {fileID: 7159638591116000982, guid: faf46657b2d66b346a227981fdafb857,
+    type: 3}
+  gridSize: {x: 50, y: 5, z: 50}
   nodeSize: 1
 --- !u!1 &1773026806
 GameObject:

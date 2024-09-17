@@ -11,9 +11,9 @@ public class Node
 
     public Node originNode { get; private set; }
 
-    public Node(float x, float z, int id)
+    public Node(float x, float z, float y, int id)
     {
-        WorldPosition = new Vector3(x, 0, z);
+        WorldPosition = new Vector3(x, y, z);
         this.id = id;
     }
 

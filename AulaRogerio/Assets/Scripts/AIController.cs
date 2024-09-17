@@ -7,6 +7,9 @@ using UnityEngine.InputSystem;
 
 public class AIController : MonoBehaviour
 {
+    [SerializeField]
+    GameObject debugCube;
+
     InputAction moveAi;
 
     List<Vector3> path;
@@ -43,6 +46,7 @@ public class AIController : MonoBehaviour
                 nearest = player;
             }
         }
+        //Instantiate(debugCube, nearest.transform.position, Quaternion.identity);
 
         return nearest.transform.position;
     }
@@ -73,9 +77,12 @@ public class AIController : MonoBehaviour
             {
                 path.RemoveAt(0);
             }
+            
 
             Debug.Log("Moving to: " + path[0]);
             yield return new WaitForEndOfFrame();
         }
+
+        Debug.Log("Endend Path");
     }
 }

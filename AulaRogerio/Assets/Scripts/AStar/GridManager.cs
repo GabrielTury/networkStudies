@@ -1,9 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.ShaderGraph.Legacy;
 using UnityEngine;
 
 public class GridManager : MonoBehaviour
 {
+    [SerializeField]
+    GameObject debugCube;
+
     [SerializeField]
     private Vector3 gridSize;
     [SerializeField]
@@ -35,7 +39,6 @@ public class GridManager : MonoBehaviour
         openNodeList = new List<Node>();
         closedNodeList = new List<Node>();
 
-        CalculateListHeuristicCost(target);
         Debug.Log("Start calculating path");
         return AStarSearch(GetNearestNode(pos), GetNearestNode(target));
     }
@@ -49,7 +52,15 @@ public class GridManager : MonoBehaviour
 
         while(openNodeList.Count > 0)
         {
-            openNodeList.Sort((n1, n2) => n1.hCost.CompareTo(n2.hCost));
+            //openNodeList.Sort((n1, n2) => n1.hCost.CompareTo(n2.hCost));
+            openNodeList.Sort((n1, n2) =>
+            {
+                int ret = (n1.hCost + n1.gCost).CompareTo(n2.hCost + n2.gCost);
+                return ret != 0 ? ret : n1.gCost.CompareTo(n2.gCost);
+            });
+
+
+
             checkNode = openNodeList[0];
 
             if(checkNode == target)
@@ -73,16 +84,17 @@ public class GridManager : MonoBehaviour
                 if (!closedNodeList.Contains(n))
                 {
                     // Calculate tentative gCost (cost from start to this tile)
-                    float tentativeGCost = checkNode.gCost - checkNode.hCost + 1;
+                    float tentativeFCost = checkNode.gCost - checkNode.hCost + 1;
 
-                    if (!openNodeList.Contains(n) || tentativeGCost < n.gCost - n.hCost)
+                    if (!openNodeList.Contains(n) || tentativeFCost < n.gCost - n.hCost)
                     {                        
-                        n.SetGCost(tentativeGCost + n.hCost);
+                        n.SetGCost(tentativeFCost + n.hCost);
                         n.SetOriginNode(checkNode);
 
                         if (!openNodeList.Contains(n))
                         {
                             openNodeList.Add(n);
+                            CalculateListHeuristicCost(target.WorldPosition, n);
                         }
                     }
                 }
@@ -92,23 +104,24 @@ public class GridManager : MonoBehaviour
         return null;
     }
 
-    private void CalculateListHeuristicCost(Vector3 target)
+    private void CalculateListHeuristicCost(Vector3 target, Node node)
     {
-        foreach (Node node in nodeList)
-        {
-            float totalDistance = Mathf.Abs(target.x - node.WorldPosition.x) + Mathf.Abs(target.y - node.WorldPosition.y); 
+
+            float totalDistance = Mathf.Abs(target.x - node.WorldPosition.x) + Mathf.Abs(target.z - node.WorldPosition.z); 
             node.SetHCost(totalDistance);
-        }
+
     }
 
     private List<Node> GetNeighborNodes(Node Node)
     {
         List<Node> neighbors = new List<Node>();
 
+
         foreach (Node t in nodeList)
         {
-            if (Mathf.Abs(t.WorldPosition.x - Node.WorldPosition.x) <= nodeSize+ 0.01f &&
-                Mathf.Abs(t.WorldPosition.y - Node.WorldPosition.y) <= nodeSize + 0.01f)
+            float dx = Mathf.Abs(t.WorldPosition.x - Node.WorldPosition.x);
+            float dy = Mathf.Abs(t.WorldPosition.z - Node.WorldPosition.z);
+            if ((dx <= nodeSize+ 0.01f || dy <= nodeSize + 0.01f) && (dx < 2 && dy < 2))
             {
                 if (t != Node) // Exclude the Node itself
                 {
@@ -133,7 +146,7 @@ public class GridManager : MonoBehaviour
                 nearest = node;
             }
         }
-
+        
         return nearest;
     }
     private List<Node> ReconstructPath(Node current)
@@ -142,9 +155,11 @@ public class GridManager : MonoBehaviour
         while (current != null)
         {
             path.Add(current);
+            Instantiate(debugCube, current.WorldPosition, Quaternion.identity);
             current = current.originNode;
         }
         path.Reverse(); // Reverse the path to get it from start to end
+        Debug.Log("Reconstructed path size: " + path.Count);
 
         //Debug.Log("Path successfully reconstructed");
 
