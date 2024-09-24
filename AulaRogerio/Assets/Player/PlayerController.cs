@@ -8,7 +8,7 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : NetworkBehaviour
 {
-    InputAction move, turn, shoot;
+    InputAction move, turn, shoot, upDown;
 
     [HideInInspector]
     public Animator animator;
@@ -31,6 +31,7 @@ public class PlayerController : NetworkBehaviour
         move = iGame.Game.Move;
         turn = iGame.Game.Turn;
         shoot = iGame.Game.Shoot;
+        upDown = iGame.Game.UpDown;
 
         animator = GetComponent<Animator>();
 
@@ -44,6 +45,7 @@ public class PlayerController : NetworkBehaviour
         move.Enable();
         turn.Enable();
         shoot.Enable();
+        upDown.Enable();
     }
 
     // Update is called once per frame
@@ -54,6 +56,9 @@ public class PlayerController : NetworkBehaviour
         transform.Translate(0,0,
             move.ReadValue<float>() * 10 * Time.deltaTime);
         movementAxis = move.ReadValue<float>();
+
+        transform.Translate(0,
+            upDown.ReadValue<float>() * 5 * Time.deltaTime, 0);
 
         transform.Rotate(0,
             turn.ReadValue<float>() * 180 * Time.deltaTime,0);
@@ -146,7 +151,7 @@ public class PlayerController : NetworkBehaviour
     public void StopWalkAnim()
     {
         StopAllCoroutines();
-        transform.position = new Vector3(transform.position.x, 0, transform.position.z);
+        transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z);
     }
 
     private void OnDisable()
@@ -154,5 +159,6 @@ public class PlayerController : NetworkBehaviour
         move.Disable();
         turn.Disable();
         shoot.Disable();
+        upDown.Disable();
     }
 }

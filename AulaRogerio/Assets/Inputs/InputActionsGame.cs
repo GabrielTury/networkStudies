@@ -62,6 +62,15 @@ public partial class @InputActionsGame: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""UpDown"",
+                    ""type"": ""Button"",
+                    ""id"": ""cb270805-83d1-44e5-999f-3f66c9d448a6"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -284,6 +293,39 @@ public partial class @InputActionsGame: IInputActionCollection2, IDisposable
                     ""action"": ""MoveAi"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""1D Axis"",
+                    ""id"": ""227f974e-5974-4530-a8ec-5633e5f87922"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""UpDown"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""55de0a3d-7180-429f-ba7a-c51ef86f1171"",
+                    ""path"": ""<Keyboard>/i"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""UpDown"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""9e31fd28-26b6-46e0-85cd-ac5f7e01c2e2"",
+                    ""path"": ""<Keyboard>/k"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""UpDown"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
                 }
             ]
         }
@@ -296,6 +338,7 @@ public partial class @InputActionsGame: IInputActionCollection2, IDisposable
         m_Game_Turn = m_Game.FindAction("Turn", throwIfNotFound: true);
         m_Game_Shoot = m_Game.FindAction("Shoot", throwIfNotFound: true);
         m_Game_MoveAi = m_Game.FindAction("MoveAi", throwIfNotFound: true);
+        m_Game_UpDown = m_Game.FindAction("UpDown", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -361,6 +404,7 @@ public partial class @InputActionsGame: IInputActionCollection2, IDisposable
     private readonly InputAction m_Game_Turn;
     private readonly InputAction m_Game_Shoot;
     private readonly InputAction m_Game_MoveAi;
+    private readonly InputAction m_Game_UpDown;
     public struct GameActions
     {
         private @InputActionsGame m_Wrapper;
@@ -369,6 +413,7 @@ public partial class @InputActionsGame: IInputActionCollection2, IDisposable
         public InputAction @Turn => m_Wrapper.m_Game_Turn;
         public InputAction @Shoot => m_Wrapper.m_Game_Shoot;
         public InputAction @MoveAi => m_Wrapper.m_Game_MoveAi;
+        public InputAction @UpDown => m_Wrapper.m_Game_UpDown;
         public InputActionMap Get() { return m_Wrapper.m_Game; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -390,6 +435,9 @@ public partial class @InputActionsGame: IInputActionCollection2, IDisposable
             @MoveAi.started += instance.OnMoveAi;
             @MoveAi.performed += instance.OnMoveAi;
             @MoveAi.canceled += instance.OnMoveAi;
+            @UpDown.started += instance.OnUpDown;
+            @UpDown.performed += instance.OnUpDown;
+            @UpDown.canceled += instance.OnUpDown;
         }
 
         private void UnregisterCallbacks(IGameActions instance)
@@ -406,6 +454,9 @@ public partial class @InputActionsGame: IInputActionCollection2, IDisposable
             @MoveAi.started -= instance.OnMoveAi;
             @MoveAi.performed -= instance.OnMoveAi;
             @MoveAi.canceled -= instance.OnMoveAi;
+            @UpDown.started -= instance.OnUpDown;
+            @UpDown.performed -= instance.OnUpDown;
+            @UpDown.canceled -= instance.OnUpDown;
         }
 
         public void RemoveCallbacks(IGameActions instance)
@@ -429,5 +480,6 @@ public partial class @InputActionsGame: IInputActionCollection2, IDisposable
         void OnTurn(InputAction.CallbackContext context);
         void OnShoot(InputAction.CallbackContext context);
         void OnMoveAi(InputAction.CallbackContext context);
+        void OnUpDown(InputAction.CallbackContext context);
     }
 }

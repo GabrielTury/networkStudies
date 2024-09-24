@@ -2052,7 +2052,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   debugCube: {fileID: 7159638591116000982, guid: faf46657b2d66b346a227981fdafb857,
     type: 3}
-  gridSize: {x: 50, y: 5, z: 50}
+  debugMaterialWall: {fileID: 2100000, guid: 6ea1e8e65dfcadc49ae467b7810ca72c, type: 2}
+  gridSize: {x: 50, y: 50, z: 50}
   nodeSize: 1
 --- !u!1 &1773026806
 GameObject:
