@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEditor.Experimental;
 using UnityEditor.ShaderGraph.Legacy;
 using UnityEngine;
+using static UnityEditor.PlayerSettings;
 
 public class GridManager : MonoBehaviour
 {
@@ -30,6 +31,9 @@ public class GridManager : MonoBehaviour
     private float executionTime;
     private bool executing;
 
+    [SerializeField, Range(1, 32)]
+    private int sizeMultiplier;
+
     private void Start()
     {
         if (instance == null)
@@ -37,8 +41,9 @@ public class GridManager : MonoBehaviour
         else
             Destroy(this);
 
-        GridCreator gc = new GridCreator(gridSize, nodeSize);
+        GridCreator gc = new GridCreator(gridSize, nodeSize, sizeMultiplier);
         nodeList = gc.CreateGrid();
+        nodeList[0].SubdivideNode();
     }
 
     private IEnumerator CountExecutionTime()
@@ -61,6 +66,7 @@ public class GridManager : MonoBehaviour
         StartCoroutine(CountExecutionTime());
 
         Debug.Log("Start calculating path");
+        //GetNearestNode(target).SubdivideNode();
         return AStarSearch(GetNearestNode(pos), GetNearestNode(target));
     }
     
@@ -142,11 +148,47 @@ public class GridManager : MonoBehaviour
     private List<Node> GetNeighborNodes(Node Node)
     {
         List<Node> neighbors = new List<Node>();
-
+        Vector3[] vertexes =
+        {
+            Node.MinPos,
+            new Vector3(Node.MinPos.x, Node.MaxPos.y, Node.MinPos.z),
+            new Vector3(Node.MaxPos.x, Node.MaxPos.y, Node.MinPos.z),
+            new Vector3(Node.MaxPos.x, Node.MinPos.y, Node.MinPos.z),
+            new Vector3(Node.MinPos.x, Node.MinPos.y, Node.MaxPos.z),
+            new Vector3(Node.MinPos.x, Node.MaxPos.y, Node.MaxPos.z),
+            new Vector3(Node.MaxPos.x, Node.MinPos.y, Node.MaxPos.z),
+            Node.MaxPos
+        };
 
         foreach (Node t in nodeList)
         {
-            float dx = Mathf.Abs(t.WorldPosition.x - Node.WorldPosition.x);
+            Vector3[] nVertexes =
+            {
+                Node.MinPos,
+                new Vector3(Node.MinPos.x, Node.MaxPos.y, Node.MinPos.z),
+                new Vector3(Node.MaxPos.x, Node.MaxPos.y, Node.MinPos.z),
+                new Vector3(Node.MaxPos.x, Node.MinPos.y, Node.MinPos.z),
+                new Vector3(Node.MinPos.x, Node.MinPos.y, Node.MaxPos.z),
+                new Vector3(Node.MinPos.x, Node.MaxPos.y, Node.MaxPos.z),
+                new Vector3(Node.MaxPos.x, Node.MinPos.y, Node.MaxPos.z),
+                Node.MaxPos
+            };
+
+            foreach (Vector3 vertex in nVertexes)
+            {
+                foreach (Vector3 nodeVertex in vertexes)
+                {
+                    if(vertex == nodeVertex)
+                    {
+                        if (t != Node) // Exclude the Node itself
+                        {
+                            neighbors.Add(t);
+                        }
+                    }
+                }
+            }
+
+/*            float dx = Mathf.Abs(t.WorldPosition.x - Node.WorldPosition.x);
             float dz = Mathf.Abs(t.WorldPosition.z - Node.WorldPosition.z);
             float dy = Mathf.Abs(t.WorldPosition.y - Node.WorldPosition.y);
             if ((dx <= nodeSize+ 0.01f || dz <= nodeSize + 0.01f || dy <= nodeSize +0.01f) && (dx < 2 && dz < 2 && dy < 2))
@@ -155,7 +197,7 @@ public class GridManager : MonoBehaviour
                 {
                     neighbors.Add(t);
                 }
-            }
+            }*/
         }
 
         return neighbors;
@@ -194,6 +236,15 @@ public class GridManager : MonoBehaviour
         return path;
     }
 
+    public void AddToNodeList(Node[] nodesToAdd)
+    {
+        Node[] newArray = new Node[nodesToAdd.Length + nodeList.Length];
+        nodeList.CopyTo( newArray, 0 );
+        nodesToAdd.CopyTo( newArray, nodeList.Length );
+
+        nodeList = newArray;
+    }
+
 
 #if UNITY_EDITOR
     bool once = false;
@@ -217,9 +268,9 @@ public class GridManager : MonoBehaviour
                 {
                     Gizmos.color = Color.white;
                 }
-                Gizmos.DrawWireCube(node.WorldPosition, Vector3.one * nodeSize);
+                Gizmos.DrawWireCube(node.WorldPosition, Vector3.one * node.nodeSize);
             }
-            once = true;
+            //once = true;
 
         }
     }

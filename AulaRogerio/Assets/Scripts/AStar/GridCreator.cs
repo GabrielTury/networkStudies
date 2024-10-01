@@ -12,18 +12,21 @@ public class GridCreator : MonoBehaviour
 
     private Node[] nodes;
 
-    public GridCreator(Vector3 gridSize, float nodeSize)
+    private int optimizationMult;
+
+    public GridCreator(Vector3 gridSize, float nodeSize, int opt)
     {
         this.gridSize = gridSize;
         this.nodeSize = nodeSize;  
+        this.optimizationMult = opt;
     }
 
     public Node[] CreateGrid()
     {
-        
-        int nodeXAmount = (int)(gridSize.x/nodeSize);
-        int nodeZAmount = (int)(gridSize.z / nodeSize);
-        int nodeYAmount = (int)(gridSize.y / nodeSize);
+        float nSize = nodeSize * optimizationMult; 
+        int nodeXAmount = (int)(gridSize.x / nSize);
+        int nodeZAmount = (int)(gridSize.z / nSize);
+        int nodeYAmount = (int)(gridSize.y / nSize);
 
         int totalTiles = nodeXAmount * nodeZAmount * nodeYAmount;
         nodes = new Node[totalTiles];
@@ -39,25 +42,26 @@ public class GridCreator : MonoBehaviour
             {
                 for (int k = 0; k < nodeYAmount; k++)
                 {
-                    int rand = Random.Range(0, 5);
+                    //int rand = Random.Range(0, 5);
                     bool wall = false;
-                    if(rand == 0)
+                    /*if(rand == 0)
                     {
                         wall = true;
-                    }
-                    Node node = new Node(nodeXPos, nodeZPos, nodeYPos, i + j, wall);
+                    }*/
+                    Node node = new Node(nodeXPos, nodeZPos, nodeYPos, i + j, wall, nSize, optimizationMult);
                     nodes[Index] = node;
                     Index++;
-                    nodeYPos += nodeSize;
+                    nodeYPos += nSize;
                 }
                 nodeYPos = 0;
-                nodeZPos += nodeSize;
+                nodeZPos += nSize;
             }
 
             nodeZPos = 0;
-            nodeXPos += nodeSize;
+            nodeXPos += nSize;
         }
 
         return nodes;
     }
+
 }

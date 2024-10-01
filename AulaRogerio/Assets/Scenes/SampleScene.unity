@@ -2055,6 +2055,7 @@ MonoBehaviour:
   debugMaterialWall: {fileID: 2100000, guid: 6ea1e8e65dfcadc49ae467b7810ca72c, type: 2}
   gridSize: {x: 50, y: 50, z: 50}
   nodeSize: 1
+  sizeMultiplier: 16
 --- !u!1 &1773026806
 GameObject:
   m_ObjectHideFlags: 0

@@ -79,7 +79,7 @@ public class AIController : MonoBehaviour
             }
             
 
-            Debug.Log("Moving to: " + path[0]);
+            //Debug.Log("Moving to: " + path[0]);
             yield return new WaitForEndOfFrame();
         }
 
