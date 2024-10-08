@@ -106,7 +106,16 @@ public class GridManager : MonoBehaviour
             openNodeList.Remove(checkNode);
             closedNodeList.Add(checkNode);
 
-            List<Node> neighbors = GetNeighborNodes(checkNode);
+            List<Node> neighbors = new List<Node>();
+
+            if (checkNode.subNodeList != null)
+            {
+                neighbors = GetNeighborNodes(checkNode, checkNode.subNodeList);
+            }
+            else
+            {
+                neighbors = GetNeighborNodes(checkNode, nodeList);
+            }
 
             foreach (Node n in neighbors)
             {
@@ -145,50 +154,15 @@ public class GridManager : MonoBehaviour
 
     }
 
-    private List<Node> GetNeighborNodes(Node Node)
+    private List<Node> GetNeighborNodes(Node Node, Node[] checkList)
     {
         List<Node> neighbors = new List<Node>();
-        Vector3[] vertexes =
+        int xNeighbors = 0;
+        int yNeighbors = 0;
+        int zNeighbors = 0;
+        foreach (Node t in checkList)
         {
-            Node.MinPos,
-            new Vector3(Node.MinPos.x, Node.MaxPos.y, Node.MinPos.z),
-            new Vector3(Node.MaxPos.x, Node.MaxPos.y, Node.MinPos.z),
-            new Vector3(Node.MaxPos.x, Node.MinPos.y, Node.MinPos.z),
-            new Vector3(Node.MinPos.x, Node.MinPos.y, Node.MaxPos.z),
-            new Vector3(Node.MinPos.x, Node.MaxPos.y, Node.MaxPos.z),
-            new Vector3(Node.MaxPos.x, Node.MinPos.y, Node.MaxPos.z),
-            Node.MaxPos
-        };
-
-        foreach (Node t in nodeList)
-        {
-            Vector3[] nVertexes =
-            {
-                Node.MinPos,
-                new Vector3(Node.MinPos.x, Node.MaxPos.y, Node.MinPos.z),
-                new Vector3(Node.MaxPos.x, Node.MaxPos.y, Node.MinPos.z),
-                new Vector3(Node.MaxPos.x, Node.MinPos.y, Node.MinPos.z),
-                new Vector3(Node.MinPos.x, Node.MinPos.y, Node.MaxPos.z),
-                new Vector3(Node.MinPos.x, Node.MaxPos.y, Node.MaxPos.z),
-                new Vector3(Node.MaxPos.x, Node.MinPos.y, Node.MaxPos.z),
-                Node.MaxPos
-            };
-
-            foreach (Vector3 vertex in nVertexes)
-            {
-                foreach (Vector3 nodeVertex in vertexes)
-                {
-                    if(vertex == nodeVertex)
-                    {
-                        if (t != Node) // Exclude the Node itself
-                        {
-                            neighbors.Add(t);
-                        }
-                    }
-                }
-            }
-
-/*            float dx = Mathf.Abs(t.WorldPosition.x - Node.WorldPosition.x);
+            float dx = Mathf.Abs(t.WorldPosition.x - Node.WorldPosition.x);
             float dz = Mathf.Abs(t.WorldPosition.z - Node.WorldPosition.z);
             float dy = Mathf.Abs(t.WorldPosition.y - Node.WorldPosition.y);
             if ((dx <= nodeSize+ 0.01f || dz <= nodeSize + 0.01f || dy <= nodeSize +0.01f) && (dx < 2 && dz < 2 && dy < 2))
@@ -197,7 +171,71 @@ public class GridManager : MonoBehaviour
                 {
                     neighbors.Add(t);
                 }
-            }*/
+
+                if(dx < nodeSize) xNeighbors++;
+                if(dy < nodeSize) yNeighbors++;
+                if(dz < nodeSize) zNeighbors++;
+            }
+        }
+
+        if(xNeighbors < 9)
+        {
+            List<Node> pNeighbors = GetNeighborNodes(Node.parent, nodeList);
+
+            Node closest = null;
+            foreach (Node p in pNeighbors)
+            {
+                
+                float distance = 1000f;
+                float checkDist = Mathf.Abs(p.WorldPosition.x - Node.WorldPosition.x);
+                if ( checkDist < distance)
+                {
+                    distance = checkDist;
+                    closest = p;
+                }
+            }
+
+            neighbors.Add(closest);
+        }
+
+        if (yNeighbors < 9)
+        {
+            List<Node> pNeighbors = GetNeighborNodes(Node.parent, nodeList);
+
+            Node closest = null;
+            foreach (Node p in pNeighbors)
+            {
+
+                float distance = 1000f;
+                float checkDist = Mathf.Abs(p.WorldPosition.y - Node.WorldPosition.y);
+                if (checkDist < distance)
+                {
+                    distance = checkDist;
+                    closest = p;
+                }
+            }
+
+            neighbors.Add(closest);
+        }
+
+        if (zNeighbors < 9)
+        {
+            List<Node> pNeighbors = GetNeighborNodes(Node.parent, nodeList);
+
+            Node closest = null;
+            foreach (Node p in pNeighbors)
+            {
+
+                float distance = 1000f;
+                float checkDist = Mathf.Abs(p.WorldPosition.z - Node.WorldPosition.z);
+                if (checkDist < distance)
+                {
+                    distance = checkDist;
+                    closest = p;
+                }
+            }
+
+            neighbors.Add(closest);
         }
 
         return neighbors;
@@ -209,6 +247,19 @@ public class GridManager : MonoBehaviour
         float distance = 100;
         foreach (Node node in nodeList)
         {
+
+            if(node.subNodeList != null)
+            {
+                foreach(Node n in  node.subNodeList)
+                {
+                    float subDistance = Vector3.Distance(currentPosition, n.WorldPosition);
+                    if(subDistance < distance)
+                    {
+                        distance = subDistance;
+                        nearest = n;
+                    }
+                }
+            }
             float currentDistance = Vector3.Distance(currentPosition, node.WorldPosition);
             if (currentDistance < distance)
             {
@@ -258,6 +309,24 @@ public class GridManager : MonoBehaviour
             reds.Add(debugMaterialWall);
             foreach (Node node in nodeList)
             {
+                if(node.subNodeList !=null)
+                {
+                    foreach (Node n in node.subNodeList)
+                    {
+                        if (node.isWall)
+                        {
+                            GameObject wall = Instantiate(debugCube, n.WorldPosition, Quaternion.identity);
+                            wall.GetComponent<MeshRenderer>().SetMaterials(reds);
+                            continue;
+                        }
+                        else
+                        {
+                            Gizmos.color = Color.white;
+                        }
+                        Gizmos.DrawWireCube(n.WorldPosition, Vector3.one * n.nodeSize);
+                    }
+                }
+
                 if(node.isWall)
                 {
                     GameObject wall = Instantiate(debugCube, node.WorldPosition, Quaternion.identity);

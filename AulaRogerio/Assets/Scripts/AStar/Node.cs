@@ -18,6 +18,10 @@ public class Node
 
     public Node originNode { get; private set; }
 
+    public Node[] subNodeList { get; private set; }
+
+    public Node parent {  get; private set; }
+
     int mult;
 
     public Node(float x, float z, float y, int id, bool isWall, float nodeSize, int mult)
@@ -75,6 +79,9 @@ public class Node
                     }*/
                     Node node = new Node(MinPos.x + (nodeSize / mult)/2 + nodeXPos, MinPos.y + (nodeSize / mult) / 2 + nodeYPos, MinPos.z + (nodeSize / mult) / 2 + nodeZPos,
                         i + j, wall, nodeSize/mult, mult);
+                    //Set parent
+                    node.parent = this;
+                    //Add to array
                     addnodes[Index] = node;
                     Index++;
                     nodeYPos += nodeSize/mult;
@@ -87,6 +94,6 @@ public class Node
             nodeXPos += nodeSize/mult;
         }
 
-        GridManager.instance.AddToNodeList(addnodes);
+        subNodeList = addnodes;
     }
 }
